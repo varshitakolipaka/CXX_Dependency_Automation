@@ -25,7 +25,7 @@ def get_all_dependencies(file_path):
                 new_file_path = optimize_file_path(actual, new_dir)
                 include_list.append(new_file_path)  # append to global list
                 included_libraries[include_list[0]].append(new_file_path)
-                
+
                 # print(new_dir + actual)
             myline = myfile.readline()
 
@@ -59,16 +59,18 @@ path_to_remove = os.getcwd()
 print(path_to_remove)
 graphviz_code = "strict digraph G{\n"
 for parent, children in included_libraries.items():
-    clean_parent = parent.replace(path_to_remove,'')
-    graphviz_code = graphviz_code + '"' + clean_parent + '"'+ "-> { "
-    s = '; '.join(str('"' + child.replace(path_to_remove,'') +'"' ) for child in children)
+    clean_parent = parent.replace(path_to_remove, '')
+    graphviz_code = graphviz_code + '"' + clean_parent + '"' + "-> { "
+    s = '; '.join(str('"' + child.replace(path_to_remove, '') + '"')
+                  for child in children)
     graphviz_code = graphviz_code + s + '};\n'
-    
+
 graphviz_code = graphviz_code + "\n}"
 print(graphviz_code)
 
-desired_path = str(input("Enter the desired directory, where you want your root file to be saved: "))
-#create desired file if not created 
+desired_path = str(input(
+    "Enter the desired directory, where you want your root file to be saved: "))
+# create desired file if not created
 # if not os.path.exists(desired_path):
 #     os.makedirs(desired_path)
 # print(included_libraries)
@@ -81,7 +83,7 @@ for file_path in included_libraries.items():
     print(exact_directory_path)
     # os.makedirs(exact_directory_path,exist_ok=True)
     # # os.makedirs(exact_directory_path)
-    os.makedirs(exact_directory_path, mode = 0o777, exist_ok=True)
+    os.makedirs(exact_directory_path, mode=0o777, exist_ok=True)
     if(os.path.exists(file_path[0])):
         open(exact_file_path, 'w').close()
         shutil.copy(file_path[0], exact_file_path)
