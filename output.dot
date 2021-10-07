@@ -1,0 +1,31 @@
+strict digraph G{
+"core.hpp"-> { "core/cvdef.h"; "core/base.hpp"; "core/cvstd.hpp"; "core/traits.hpp"; "core/matx.hpp"; "core/types.hpp"; "core/mat.hpp"; "core/persistence.hpp"; "core/operations.hpp"; "core/cvstd.inl.hpp"; "core/utility.hpp"; "core/optim.hpp"; "core/ovx.hpp"};
+"core/cvdef.h"-> { "core/version.hpp"; "core/interface.h"; "core/cv_cpu_dispatch.h"; "core/fast_math.hpp"};
+"core/base.hpp"-> { "core/opencv_modules.hpp"; "core/cvdef.h"; "core/cvstd.hpp"; "core/neon_utils.hpp"; "core/vsx_utils.hpp"; "core/check.hpp"};
+"core/cvstd.hpp"-> { "core/cvdef.h"; "core/cvstd_wrapper.hpp"};
+"core/traits.hpp"-> { "core/cvdef.h"};
+"core/matx.hpp"-> { "core/cvdef.h"; "core/base.hpp"; "core/traits.hpp"; "core/saturate.hpp"};
+"core/types.hpp"-> { "core/cvdef.h"; "core/cvstd.hpp"; "core/matx.hpp"};
+"core/mat.hpp"-> { "core/matx.hpp"; "core/types.hpp"; "core/bufferpool.hpp"; "core/mat.inl.hpp"};
+"core/persistence.hpp"-> { "core/types.hpp"; "core/mat.hpp"};
+"core/operations.hpp"-> { };
+"core/cvstd.inl.hpp"-> { };
+"core/utility.hpp"-> { "core/core.hpp"};
+"core/optim.hpp"-> { "core/core.hpp"};
+"core/ovx.hpp"-> { "core/cvdef.h"};
+"core/version.hpp"-> { };
+"core/interface.h"-> { };
+"core/cv_cpu_dispatch.h"-> { "core/cv_cpu_helper.h"};
+"core/fast_math.hpp"-> { "core/cvdef.h"};
+"core/opencv_modules.hpp"-> { };
+"core/neon_utils.hpp"-> { "core/cvdef.h"};
+"core/vsx_utils.hpp"-> { "core/cvdef.h"};
+"core/check.hpp"-> { "core/base.hpp"};
+"core/cvstd_wrapper.hpp"-> { "core/cvdef.h"};
+"core/saturate.hpp"-> { "core/cvdef.h"; "core/fast_math.hpp"};
+"core/bufferpool.hpp"-> { };
+"core/mat.inl.hpp"-> { };
+"core/core.hpp"-> { };
+"core/cv_cpu_helper.h"-> { };
+
+}
