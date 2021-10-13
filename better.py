@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 import re
 import pydot
-import numpy
+
 
 def getFolderPath(file_path):
     folder_path = re.match("^(.*[\/])", file_path).group(1)
