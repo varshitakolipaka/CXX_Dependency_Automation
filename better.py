@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 import re
 import pydot
+import numpy
 
 def getFolderPath(file_path):
     folder_path = re.match("^(.*[\/])", file_path).group(1)
@@ -37,12 +38,9 @@ def compressFilePath(file_path, folder_path):
         file_path = file_path[2:] 
     
     while file_path.startswith( "../"):
-        print("CAME HEREEE!!!!!    ", file_path)
-        print("BEFORE: ", folder_path)
         if folder_path.endswith("/"):
             folder_path = folder_path[:-1]
         folder_path = re.match("^(.*[\/])", folder_path).group(1)
-        print("AFTER: ", folder_path)
         file_path = file_path[3:]
     print(folder_path + file_path)
     return folder_path + file_path
@@ -102,9 +100,6 @@ def initIncludeDict(included_libraries):
             included_libraries[include_list[0]] = []
             getDependencies(include_list[0])
         include_list.pop(0)
-# def processInclude()
-
-
 
 include_list = []
 included_libraries = {}
@@ -120,10 +115,6 @@ path_to_remove = find_common_path(included_libraries)
 
 createDotFile(included_libraries, path_to_remove)
 
-
-
-# temp_paths = []
-
 intact_path = input("Enter the directory structure to keep intact (Must be a substring from the end): ")
 intact_path = processIntactPath(intact_path)
 
@@ -135,14 +126,8 @@ if not desired_path.endswith("/"):
     desired_path += "/" 
 
 for file_path in included_libraries.items():
-    # print("FILE PATH: ",file_path)
-    # print("file path; ", file_path[0])
-    # print("REMOVED THIS: ", path_to_remove)
     exact_file_path = file_path[0].replace(path_to_remove, desired_path)
-    # print("exact file path; ",exact_file_path)
     exact_directory_path = re.match(r"^(.*[\/])", exact_file_path).group(1)
-    # print(exact_directory_path)
-    # print("exact directory path; ",exact_directory_path)
     if os.path.exists(file_path[0]):
         os.makedirs(exact_directory_path, mode=0o777, exist_ok=True)
         open(exact_file_path, "w").close()
