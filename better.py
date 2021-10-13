@@ -2,6 +2,7 @@ import os
 import shutil
 from pathlib import Path
 import re
+import pydot
 
 def getFolderPath(file_path):
     folder_path = re.match("^(.*[\/])", file_path).group(1)
@@ -30,8 +31,6 @@ def getDependencies(file_path):
 
     return include_list
 
-
-
 def compressFilePath(file_path, folder_path):
 
     while file_path.startswith("./"):
@@ -45,7 +44,7 @@ def compressFilePath(file_path, folder_path):
         folder_path = re.match("^(.*[\/])", folder_path).group(1)
         print("AFTER: ", folder_path)
         file_path = file_path[3:]
-    # print(folder_path + file_path)
+    print(folder_path + file_path)
     return folder_path + file_path
 
 def find_common_path(dictionary):
@@ -80,45 +79,53 @@ def processIntactPath(intact_path):
     if not intact_path.endswith("/"):
         intact_path = intact_path[:-1]
     return intact_path
-# --------works----------
 
-# main
+def createDotFile(included_libraries, path_to_remove):
+    graphviz_code = "strict digraph G {\n"
+    for parent, children in included_libraries.items():
+        clean_parent = parent.replace(path_to_remove, "")
+        graphviz_code = graphviz_code + '"' + clean_parent + '"' + "-> { "
+        s = "; ".join(
+            str('"' + child.replace(path_to_remove, "") + '"') for child in children
+        )
+        graphviz_code = graphviz_code + s + "};\n"
 
-input_path = input("File Path: ")
+    graphviz_code = graphviz_code + "\n}"
+    print(graphviz_code)
+    graph, = pydot.graph_from_dot_data(graphviz_code)
+    image_path = input("Enter Image Path:")
+    graph.write_png(image_path )
+
+def initIncludeDict(included_libraries):
+    while len(include_list) > 0:
+        if include_list[0] not in included_libraries:
+            included_libraries[include_list[0]] = []
+            getDependencies(include_list[0])
+        include_list.pop(0)
+# def processInclude()
+
 
 
 include_list = []
+included_libraries = {}
+
+input_path = input("File Path: ")
+
 if input_path.startswith("/"):
     input_path = os.path.abspath(input_path)
 
 include_list.append(input_path)
-included_libraries = {}
+initIncludeDict(included_libraries)
+path_to_remove = find_common_path(included_libraries)
+
+createDotFile(included_libraries, path_to_remove)
 
 
-while len(include_list) > 0:
-    if include_list[0] not in included_libraries:
-        included_libraries[include_list[0]] = []
-        getDependencies(include_list[0])
-    include_list.pop(0)
 
-# --------idknow-----------
-temp_paths = []
+# temp_paths = []
 
 intact_path = input("Enter the directory structure to keep intact (Must be a substring from the end): ")
 intact_path = processIntactPath(intact_path)
-
-path_to_remove = find_common_path(included_libraries) 
-graphviz_code = "strict digraph G {\n"
-for parent, children in included_libraries.items():
-    clean_parent = parent.replace(path_to_remove, "")
-    graphviz_code = graphviz_code + '"' + clean_parent + '"' + "-> { "
-    s = "; ".join(
-        str('"' + child.replace(path_to_remove, "") + '"') for child in children
-    )
-    graphviz_code = graphviz_code + s + "};\n"
-
-graphviz_code = graphviz_code + "\n}"
-print(graphviz_code)
 
 desired_path = str(
     input("Enter the desired directory, where you want your root file: ")
@@ -136,7 +143,7 @@ for file_path in included_libraries.items():
     exact_directory_path = re.match(r"^(.*[\/])", exact_file_path).group(1)
     # print(exact_directory_path)
     # print("exact directory path; ",exact_directory_path)
-    os.makedirs(exact_directory_path, mode=0o777, exist_ok=True)
     if os.path.exists(file_path[0]):
+        os.makedirs(exact_directory_path, mode=0o777, exist_ok=True)
         open(exact_file_path, "w").close()
         shutil.copy(file_path[0], exact_file_path)
