@@ -16,7 +16,6 @@ def getIncludes(myline):
     match = re.findall('(#include *\"(.*?.(h|hpp))\")|(#include *\<(.*?.(h|hpp))\>)', myline)
     # checks in [()], and whether such an array exists, else, an include is not found
     if len(match):
-        print(match)
         if match[0][1] != "":
             include_file_name = match[0][1]
         elif match[0][4] and match[0][4] != "":
@@ -34,6 +33,7 @@ def getDependencies(file_path, included_libraries):
     path_to_file = getFolderPath(file_path)
     # check if such a file exists, and it isn't empty stringed
     if os.path.exists(file_path) and file_path != "" and os.path.isdir(file_path) != 1:
+        print("it's a real file")
         # opening the file
         myfile = open(file_path, "r")
         myline = myfile.readline()
@@ -47,6 +47,7 @@ def getDependencies(file_path, included_libraries):
                 # if file not found, try finding file in the root directory of file
                 print("Raw include:", include_file_name)
                 include_file_name = compressFilePath(include_file_name, path_to_file)
+                print("After compression:", include_file_name)
                 include_file_name = processInputPath(path_to_file, include_file_name)
 
                 # print("NEW PATH: ", include_file_name)
@@ -64,23 +65,26 @@ def getDependencies(file_path, included_libraries):
 def compressFilePath(file_path, folder_path):
     if file_path.startswith("/"):
         return file_path
-    while file_path.startswith("./"):
-        file_path = file_path[2:]
-    
-    while file_path.startswith( "../"):
-        if folder_path.endswith("/"):
-            folder_path = folder_path[:-1]
-        folder_path = re.match("^(.*[\/])", folder_path).group(1)
-        file_path = file_path[3:]
-    # print(folder_path + file_path)
-    return folder_path + file_path
+    if file_path.startswith("./") or file_path.startswith("../"):
+        correction_required = 1
+        while file_path.startswith("./"):
+            file_path = file_path[2:]
+        # shorten file paths by removing ../ and ./
+        while file_path.startswith( "../"):
+            if folder_path.endswith("/"):
+                folder_path = folder_path[:-1]
+            folder_path = re.match("^(.*[\/])", folder_path).group(1)
+            file_path = file_path[3:]
+        return folder_path, file_path
+    return file_path
 
 def find_common_path(dictionary):
     array = keys_to_arr(dictionary)
-    common_path = os.path.commonpath(array)
-    return common_path
-    # if not common.endswith("/"):
-    #     common = re.match("^(.*[\/])", common).group(1)
+    common = os.path.commonpath(array)
+    if not common.endswith("/"):
+        common = re.match("^(.*[\/])", common).group(1)
+    return common
+    
 
 
 def rename_keys_dict(common_path, required_path, dictionary):
@@ -126,15 +130,17 @@ def initIncludeDict(included_libraries, include_list):
         include_list.pop(0)
 
 def processInputPath(folder_path,input_path):
-    path = folder_path + input_path
-    
-    if input_path.startswith("/"):
-        path = input_path
-    if not os.path.exists(folder_path+input_path) or os.path == "":
-        temp_path = "/Users/vars/OneDrive - International Institute of Information Technology/CXX_Dependency_Automation/" + input_path
+    print("PATH = ", input_path)
+    abspath = (folder_path+input_path)
+    abspath = os.path.abspath(abspath)
+    print(abspath)
+    path = abspath
+    if not os.path.exists(abspath) or os.path == "":
+        print("IT IS GOING HERE")
+        temp_path = "/usr/local/Cellar/opencv/4.5.3_3/include/opencv4/" + input_path
         if os.path.exists(temp_path):
             path = temp_path
-        path = os.path.abspath(path)
+        
     return path
 
 
@@ -150,7 +156,7 @@ included_libraries = {}
 input_path = input("File Path: ")
 input_path = processInputPath("", input_path)
 
-
+#  initialise the include list and the include dictionary, basically, we add the file that calls all the other fiels
 include_list.append(input_path)
 initIncludeDict(included_libraries, include_list)
 path_to_remove = find_common_path(included_libraries)
