@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import pydot
 
-
+     
 def getFolderPath(file_path):
     # get everything before the last slash
     folder_path = re.match("^(.*[\/])", file_path).group(1)
@@ -39,6 +39,7 @@ def getDependencies(file_path, included_libraries):
         myline = myfile.readline()
         # do for each line in the file, while reading line by line
         while myline:
+
             # get an instance of #include
             include_file_name = getIncludes(myline)
             # if something is being included...
@@ -48,7 +49,7 @@ def getDependencies(file_path, included_libraries):
                 print("Raw include:", include_file_name)
                 include_file_name = compressFilePath(include_file_name, path_to_file)
                 print("After compression:", include_file_name)
-                include_file_name = processInputPath(path_to_file, include_file_name)
+                include_file_name = processInputPath(path_to_file, include_file_name, valid_lookup_path)
 
                 # print("NEW PATH: ", include_file_name)
                 
@@ -80,8 +81,17 @@ def compressFilePath(file_path, folder_path):
 
 def find_common_path(dictionary):
     array = keys_to_arr(dictionary)
-    common = os.path.commonpath(array)
-    if not common.endswith("/"):
+    # common = os.path.commonpath(array)
+    ind1 = 0
+    ind2 = 1
+    common = ""
+    while(ind1 < len(array) and ind2 < len(array)):
+        common = os.path.commonpath([array[ind1], array[ind2]])
+        ind1+=1
+        ind2+=1
+    print("COMMON:", common)
+    if not common.endswith("/") and common != "":
+        common = common + "/"
         common = re.match("^(.*[\/])", common).group(1)
     return common
     
@@ -129,15 +139,24 @@ def initIncludeDict(included_libraries, include_list):
             getDependencies(include_list[0], included_libraries)
         include_list.pop(0)
 
-def processInputPath(folder_path,input_path):
+def processInputPath(folder_path,input_path, valid_lookup_path):
     print("PATH = ", input_path)
     abspath = (folder_path+input_path)
     abspath = os.path.abspath(abspath)
     print(abspath)
+    print("VALID THINGY:", valid_lookup_path)
     path = abspath
     if not os.path.exists(abspath) or os.path == "":
-        print("IT IS GOING HERE")
-        temp_path = "/usr/local/Cellar/opencv/4.5.3_3/include/opencv4/" + input_path
+        if not os.path.exists(valid_lookup_path + input_path):
+            for lookup_path in lookup_paths:
+                if os.path.exists(lookup_path + input_path):
+                    valid_lookup_path = lookup_path
+                    temp_path = valid_lookup_path + input_path
+                    break
+
+        temp_path = valid_lookup_path + input_path
+        if(valid_lookup_path == ""):
+            temp_path = os.path.abspath(input_path)
         if os.path.exists(temp_path):
             path = temp_path
         
@@ -147,6 +166,16 @@ def processInputPath(folder_path,input_path):
 
 # Driver code ------------------------------------
 
+lookup_paths = []
+valid_lookup_path = ""
+
+# open lookup_paths.txt and add each line to lookup_paths array
+with open("lookup_paths.txt", "r") as myfile:
+    for line in myfile:
+        lookup_paths.append(line.rstrip("\n"))
+
+print(lookup_paths)  
+
 # unfiltered, every include is added here
 include_list = []
 # final includes, with no repeats are added here
@@ -154,7 +183,7 @@ included_libraries = {}
 
 
 input_path = input("File Path: ")
-input_path = processInputPath("", input_path)
+input_path = processInputPath("", input_path, valid_lookup_path)
 
 #  initialise the include list and the include dictionary, basically, we add the file that calls all the other fiels
 include_list.append(input_path)
