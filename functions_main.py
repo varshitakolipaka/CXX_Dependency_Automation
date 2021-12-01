@@ -113,8 +113,9 @@ def processIntactPath(intact_path):
     if not intact_path.startswith("/"):
         intact_path = "/" + intact_path
     if not intact_path.endswith("/"):
-        intact_path = intact_path[:-1]
+        intact_path = intact_path + "/"
     return intact_path
+        
 
 def createDotFile(included_libraries, path_to_remove):
     graphviz_code = "strict digraph G {\n"
@@ -147,7 +148,7 @@ def processInputPath(folder_path,input_path):
     path = abspath
     if not os.path.exists(abspath) or os.path == "":
         # print("IT IS GOING HERE")
-        temp_path = "/Users/vars/OneDrive - International Institute of Information Technology/CXX_Dependency_Automation/" + input_path
+        temp_path = "/usr/local/Cellar/opencv/4.5.3_3/include/opencv4/" + input_path
         if os.path.exists(temp_path):
             path = temp_path
         
