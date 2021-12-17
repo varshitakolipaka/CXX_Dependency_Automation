@@ -1,0 +1,7 @@
+onnx- easier to support, convert other models to this type
+- compatibility required b/w opencv and onnx (add onnx support to opencv) - open source 
+- relearning, etc. need to be enabled 
+
+- we need to be able to use our custom dnn to do this
+
+- MAKE A PLANN

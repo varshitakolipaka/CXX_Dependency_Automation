@@ -17,7 +17,7 @@ path_to_remove = find_common_path(included_libraries)
 
 createDotFile(included_libraries, path_to_remove)
 
-intact_path = input("Enter the directory structure to keep intact (Must be a substring of original path from the end, please end with a '/'): ")
+intact_path = input("Enter the directory structure to keep intact (Must be a substring of original path from the end, please end with): ")
 intact_path = processIntactPath(intact_path)
 
 desired_path = str(
