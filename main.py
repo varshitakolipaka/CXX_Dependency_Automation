@@ -38,6 +38,7 @@ for file_path in included_libraries.items():
             # check if file_path[0] and exact_file_path aren't the same file
             if file_path[0] != exact_file_path:
                 # print("Copying: ", file_path[0], " to ", exact_file_path)
-                shutil.copy(file_path[0], exact_file_path)
+                preprocess_includes(file_path[0], exact_file_path)
+                # shutil.copy(file_path[0], exact_file_path)
 
-print(included_libraries)
+# print(included_libraries)
